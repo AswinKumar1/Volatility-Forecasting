@@ -1,26 +1,131 @@
-# Volatility-Forecasting
+# Volatility Forecasting in Financial Markets
+## Overview
 
-## Volatility Forecasting in Financial Markets: A Comparative Analysis of GARCH variant and SVR-variant model and Moment (Foundational Model)
+Volatility forecasting is a critical component in financial markets, assisting in risk management, derivative pricing, market-making, portfolio optimization, and many other financial activities. A risk manager, for instance, needs to assess the likelihood of a portfolio's decline over time. An options trader is interested in predicting volatility throughout the lifespan of a contract. Similarly, portfolio managers need to know when to adjust their holdings to avoid undue risk. Understanding and forecasting volatility is therefore vital for making informed financial decisions.
 
-Volatility forecasting is an important aspect in finance as it helps in making decisions on risk management, derivative pricing, market making, portfolio selection and many other financial activities. It’s essential as a risk manager would like to know today the likelihood of decline in his  portfolio in future. An option trader would like to know the volatility that can be expected over the future life of the contract. A portfolio manager would like to know if he/she has to sell a stock or a portfolio before it becomes too volatile. As the current trend in trading is increasing amongst students and youngsters, it's important for them to understand the volatility of a stock before making an investment decision. 
+In this project, I aim to compare the performance of different models for forecasting volatility in financial markets, specifically focusing on GARCH-LSTM and SVR models, and comparing them to a Linear Regression model. The models are applied to forecast the volatility of financial assets, such as the S&P 500 index, using historical price data.
 
-Through this project, I aim to compare the performance of a traditional model such as GARCH (Generalized Autoregressive Conditional Heteroskedasticity) with LSTM, and a machine learning model, Support Vector Regression (SVR) with XgBoost and compare it with the Large language models such as Moment, https://huggingface.co/AutonLab/MOMENT-1-large, in forecasting the volatility of financial assets such as S&P500. 
+### Project Objectives
+The primary goal of this project is to develop and compare the performance of the following models in forecasting volatility:
 
-Aim is to develop and implement GARCH with LSTM and SVR with XgBoost models for forecasting financial market volatility by using historical price data and predict volatility to compare predicted vs. realized volatility and assess each model’s performance in stable and volatile market conditions using metrics such as Mean Squared Error (MSE) and R-squared. 
+- GARCH-LSTM (Generalized Autoregressive Conditional Heteroskedasticity + Long Short-Term Memory) model
+- SVR (Support Vector Regression) model
+- Linear Regression model (for comparison)
 
-### Data Sources: 
-- Collect historical price data from Yahoo Finance focusing on daily closing prices of a chosen financial asset (e.g., S&P 500) and use VIX (Volatility Index) as a benchmark for evaluating model predictions. 
+We will evaluate these models' ability to forecast volatility and assess their performance under both stable and volatile market conditions using key evaluation metrics like Mean Squared Error (MSE) and R-squared.
 
-### Methodology: 
-- Data Preprocessing: Clean and preprocess historical price data by calculating log returns.
+### Data Sources
+- Historical Price Data: Daily closing prices of the S&P 500 (or any other chosen financial asset) from Yahoo Finance.
+- Volatility Index (VIX): Used as a benchmark for evaluating model predictions and comparing realized volatility against predicted volatility.
 
-### Model Implementation:
-- GARCH & LSTM Model: Use the ARCH package in Python to forecast time-varying volatility.
-- SVR & XgBoost: Implement using scikit-learn, optimizing parameters via cross-validation.
+### Methodology
+#### Data Preprocessing
 
-### Evaluation: 
-- Compare the performance of both models against realized volatility using MSE and R-squared as this is a regression task. 
+1. Log Returns Calculation: The historical closing prices are used to calculate log returns, which are the percentage changes in price.
 
-### Tools and Technologies: 
-- Python, pandas, NumPy, ARCH, and scikit-learn for modeling and data processing.
-- Matplotlib, seaborn and Tableau (optional) for data visualization.
+```python
+data['Log_Return'] = np.log(data['Close'] / data['Close'].shift(1))
+```
+
+2. Volatility Feature: A volatility feature is constructed by calculating the rolling 21-day standard deviation of the log returns and annualizing it by multiplying by the square root of 252 (trading days in a year).
+
+```python
+data['Volatility'] = data['Log_Return'].rolling(window=21).std() * np.sqrt(252)
+```
+
+This volatility feature serves as the target variable for volatility forecasting in this project.
+
+3. Technical Indicators:
+
+Simple Moving Averages (SMA): Two common moving averages are calculated for trend analysis:
+
+- SMA 20 (20-day moving average)
+- SMA 50 (50-day moving average)
+```python
+data['SMA_20'] = data['Close'].rolling(window=20).mean()
+data['SMA_50'] = data['Close'].rolling(window=50).mean()
+```
+
+- Relative Strength Index (RSI): A momentum oscillator is calculated using the RSI indicator, which measures the speed and change of price movements, helping to identify overbought or oversold conditions.
+```python
+import ta
+data['RSI'] = ta.momentum.RSIIndicator(data['Close'].squeeze()).rsi()
+```
+
+4. Data Cleaning: Missing or incomplete data is handled appropriately to ensure model robustness. This includes removing NaN values generated by rolling window calculations.
+
+
+### Model Implementation
+- GARCH-LSTM Model:
+
+The GARCH model is used to model the time-varying volatility, capturing the heteroskedastic nature of financial returns.
+The LSTM (Long Short-Term Memory) network is used to capture the sequential patterns and dependencies in the volatility data, integrating the predictive power of deep learning with traditional volatility forecasting models.
+
+- SVR Model:
+Support Vector Regression is employed as a non-linear regression model to forecast volatility using historical price data.
+Hyperparameters of the model are optimized using cross-validation to ensure the best performance.
+
+- Linear Regression Model:
+A baseline model that applies linear regression to forecast volatility, providing a simple yet effective comparison against more complex models.
+
+### Model Evaluation
+- Metrics: The models are evaluated using the following metrics:
+- Mean Squared Error (MSE): Measures the average squared difference between predicted and actual volatility.
+- R-squared: Assesses the proportion of variance in the volatility that is explained by the model.
+Tools & Technologies
+- Programming Language: Python
+
+#### Libraries:
+- pandas & NumPy: Data processing and manipulation
+- ARCH: For GARCH model implementation
+- scikit-learn: For SVR and Linear Regression model implementation
+- Keras/TensorFlow: For implementing the LSTM model
+- Matplotlib, seaborn: Data visualization
+- Tableau (optional): For advanced data visualization and reporting
+
+### Installation and Setup
+- Clone the repository:
+
+```bash
+git clone https://github.com/yourusername/Volatility-Forecasting.git
+cd Volatility-Forecasting
+```
+
+### Install dependencies:
+Ensure you have Python 3.x installed. Then, install the required libraries using pip:
+
+``` bash
+pip install -r requirements.txt
+```
+
+### Data Retrieval:
+To fetch historical data, you can use the yfinance package. For example:
+``` python
+import yfinance as yf
+data = yf.download('^GSPC', start='2000-01-01', end='2024-01-01')
+``` 
+
+### Running the Models:
+
+#### GARCH-LSTM Model:
+Run the script which has inbuilt GARCH-LSTM model to implement and train the model.
+
+#### SVR Model:
+Run the script which has inbuilt SVR model to implement and train the model.
+
+#### Linear Regression Model:
+Run the script which has inbuilt Linear Regression model to implement and train the model.
+
+### Evaluation:
+At the end of the model implementation, the model has inbuilt evaluation scores of MSE or R-2 values. 
+
+### Results and Evaluation
+After training, the models' performance is evaluated based on MSE and R-squared. Comparative analysis of GARCH-LSTM, SVR, and Linear Regression models will be conducted to determine which model provides the most accurate volatility forecasts in both stable and volatile market conditions.
+
+### Conclusion
+This project demonstrates the comparative performance of traditional and machine learning-based models for volatility forecasting. By integrating GARCH with LSTM and comparing it with SVR and Linear Regression models, the goal is to provide a robust approach for volatility prediction, crucial for risk management and investment strategies in financial markets.
+
+### Future Work
+- Improving Model Performance: Further optimization of hyperparameters and the use of additional features (e.g., trading volume, macroeconomic indicators) could improve model accuracy.
+- Real-time Forecasting: Implementing the models in a live environment to predict volatility in real time.
+- Analyze with other models: Optimize the prediction of volatility using other Large Statistical models like Moment-1-large, Facebook's Prophet etc. 
