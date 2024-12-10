@@ -102,7 +102,7 @@ pip install -r requirements.txt
 To fetch historical data, you can use the yfinance package. For example:
 ``` python
 import yfinance as yf
-data = yf.download('^GSPC', start='2000-01-01', end='2024-01-01')
+data = yf.download('^GSPC', start='2010-01-01', end='2020-01-01')
 ``` 
 
 ### Running the Models:
